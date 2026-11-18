@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Language Glove — Live Speech Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Navigation Bar -->
+    <header class="navbar">
+      <div class="nav-brand">
+        <div class="logo-icon">🧤</div>
+        <div class="brand-text">
+          <h1>Sign Glove Speech Portal</h1>
+          <span class="subtitle">Cloud Layer &middot; Public Reader & Admin Review</span>
+        </div>
+      </div>
+      
+      <div class="nav-tabs">
+        <button id="nav-tab-reader" class="nav-tab-btn active">
+          <span class="icon">💬</span> Spoken Stream
+        </button>
+        <button id="nav-tab-hand3d" class="nav-tab-btn">
+          <span class="icon">🖐️</span> 3D Hand Model
+        </button>
+        <button id="nav-tab-admin" class="nav-tab-btn">
+          <span class="icon">🔒</span> Admin Review
+        </button>
+      </div>
+    </header>
+
+    <!-- Global Connection Status Banner -->
+    <div id="status-bar" class="status-bar status-online">
+      <div class="status-indicator">
+        <span class="pulse-dot"></span>
+        <span id="status-text">Connected &middot; Live stream active</span>
+      </div>
+      <div class="tts-controls">
+        <label class="toggle-switch">
+          <input type="checkbox" id="auto-speak-toggle" checked>
+          <span class="slider"></span>
+        </label>
+        <span class="tts-label">Auto-speak new phrases</span>
+      </div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="main-content">
+      
+      <!-- Public Reader Section -->
+      <section id="reader-section" class="content-section active">
+        <div class="section-header">
+          <div>
+            <h2>Approved Phrase Stream</h2>
+            <p class="description">Public phrases spoken by the sign language glove and verified by administrators.</p>
+          </div>
+          <div class="stats-pills">
+            <div class="stat-pill">
+              <span class="stat-num" id="stat-total">0</span>
+              <span class="stat-label">Total</span>
+            </div>
+            <div class="stat-pill emergency">
+              <span class="stat-num" id="stat-emergency">0</span>
+              <span class="stat-label">Emergency</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Spoken Message Hero Box -->
+        <div id="latest-hero" class="latest-hero-card">
+          <div class="hero-top">
+            <div class="hero-tag-badge">
+              <span class="hero-pulse"></span>
+              <span id="hero-tag">LATEST SPOKEN MESSAGE</span>
+            </div>
+            <span class="hero-time" id="hero-time">Waiting for first sign...</span>
+          </div>
+          <div class="hero-text" id="hero-text">"READY FOR SIGNS"</div>
+          <div class="hero-meta">
+            <span class="badge daily" id="hero-cat-badge">Daily needs</span>
+            <span class="hero-source" id="hero-source">Transport: Glove AI Engine</span>
+            <button class="btn btn-sm btn-primary hero-btn" id="hero-speak-btn" onclick="speakCurrentHero()">
+              🔊 Speak Aloud
+            </button>
+          </div>
+        </div>
+
+        <!-- Gesture Soundboard / Quick Test Simulator -->
+        <div class="soundboard-box">
+          <div class="soundboard-header">
+            <strong>🎯 Interactive Gesture Soundboard (Click to Speak & Trigger Glove):</strong>
+          </div>
+          <div class="soundboard-grid">
+            <button class="btn-sound" onclick="triggerPhrase(1, 'HELLO')">✋ 1. HELLO</button>
+            <button class="btn-sound" onclick="triggerPhrase(2, 'THANK YOU')">🙏 2. THANK YOU</button>
+            <button class="btn-sound" onclick="triggerPhrase(3, 'YES')">👍 3. YES</button>
+            <button class="btn-sound" onclick="triggerPhrase(4, 'NO')">👎 4. NO</button>
+            <button class="btn-sound" onclick="triggerPhrase(5, 'PLEASE')">🤲 5. PLEASE</button>
+            <button class="btn-sound" onclick="triggerPhrase(6, 'WATER')">💧 6. WATER</button>
+            <button class="btn-sound" onclick="triggerPhrase(7, 'FOOD')">🍲 7. FOOD</button>
+            <button class="btn-sound emergency-btn" onclick="triggerPhrase(8, 'I NEED HELP')">🚨 8. I NEED HELP</button>
+            <button class="btn-sound" onclick="triggerPhrase(9, 'WHERE IS THE TOILET')">🚻 9. TOILET</button>
+          </div>
+        </div>
+
+        <!-- Live Glove Telemetry Panel -->
+        <div class="telemetry-panel">
+          <div class="telemetry-header">
+            <div class="telemetry-title">
+              <span class="telemetry-icon">🖐️</span>
+              <div>
+                <strong>Live Glove Sensor Telemetry</strong>
+                <span class="telemetry-sub" id="telemetry-status">Synced via Firebase Realtime Database &bull; Fast & Quota-Safe</span>
+              </div>
+            </div>
+            <div class="telemetry-badge" id="telemetry-signal">Wi-Fi: Active</div>
+          </div>
+          
+          <div class="finger-bars-grid">
+            <div class="finger-bar-col">
+              <div class="finger-track">
+                <div class="finger-fill" id="bar-f1" style="height: 20%;"></div>
+              </div>
+              <span class="finger-name">Thumb</span>
+              <span class="finger-val" id="val-f1">1170</span>
+            </div>
+            <div class="finger-bar-col">
+              <div class="finger-track">
+                <div class="finger-fill" id="bar-f2" style="height: 15%;"></div>
+              </div>
+              <span class="finger-name">Index</span>
+              <span class="finger-val" id="val-f2">1165</span>
+            </div>
+            <div class="finger-bar-col">
+              <div class="finger-track">
+                <div class="finger-fill" id="bar-f3" style="height: 18%;"></div>
+              </div>
+              <span class="finger-name">Middle</span>
+              <span class="finger-val" id="val-f3">1180</span>
+            </div>
+            <div class="finger-bar-col">
+              <div class="finger-track">
+                <div class="finger-fill" id="bar-f4" style="height: 14%;"></div>
+              </div>
+              <span class="finger-name">Ring</span>
+              <span class="finger-val" id="val-f4">1172</span>
+            </div>
+            <div class="finger-bar-col">
+              <div class="finger-track">
+                <div class="finger-fill" id="bar-f5" style="height: 12%;"></div>
+              </div>
+              <span class="finger-name">Little</span>
+              <span class="finger-val" id="val-f5">1168</span>
+            </div>
+          </div>
+
+          <div class="telemetry-imu-row">
+            <span>Hand Tilt: <b id="val-tilt">Flat (Palm Down)</b></span>
+            <span>Accel: <code id="val-acc">[0.05, -0.02, 0.98] g</code></span>
+            <span>Update Rate: <b>0.5 Hz (Lag-Free)</b></span>
+          </div>
+        </div>
+
+        <!-- Filter and Search Bar -->
+        <div class="filter-bar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="phrase-search" placeholder="Search phrases (e.g., help, water)...">
+          </div>
+          <div class="category-tabs">
+            <button class="tab-btn active" data-category="all">All</button>
+            <button class="tab-btn" data-category="Emergency">Emergency</button>
+            <button class="tab-btn" data-category="Daily needs">Daily needs</button>
+          </div>
+        </div>
+
+        <!-- Feed List -->
+        <div id="phrases-feed" class="phrases-feed">
+          <!-- Dynamically populated phrase cards -->
+          <div class="empty-state">
+            <div class="empty-icon">📡</div>
+            <p>Waiting for incoming phrases...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3D Hand Visualizer Section -->
+      <section id="hand3d-section" class="content-section">
+        <div class="section-header">
+          <div>
+            <h2>3D Real-Time Hand Pose Visualizer</h2>
+            <p class="description">Live 3D kinematic model animated by ESP32 flex sensors and MPU6050 accelerometer from Firebase.</p>
+          </div>
+          <div class="hand3d-actions">
+            <button id="reset-cam-btn" class="btn btn-sm btn-outline">🔄 Reset 3D Camera</button>
+          </div>
+        </div>
+
+        <!-- 3D Canvas Box -->
+        <div class="hand3d-viewport-card">
+          <div id="hand-3d-canvas" class="hand-3d-canvas"></div>
+          
+          <!-- Floating Pose Detection Badge -->
+          <div class="pose-overlay">
+            <span class="pose-title">CURRENT DETECTED POSE:</span>
+            <div id="3d-pose-text" class="pose-name">NEUTRAL (FLAT HAND)</div>
+            <span id="3d-pose-desc" class="pose-sub">Fingers open &bull; Palm facing down</span>
+          </div>
+
+          <!-- Interaction Hint -->
+          <div class="viewport-hint">
+            <span>🖱️ Click & Drag to Orbit &bull; Scroll to Zoom &bull; Right-Click to Pan</span>
+          </div>
+        </div>
+
+        <!-- Interactive Pose Demo Buttons -->
+        <div class="pose-test-panel">
+          <h3>Interactive Pose Demonstration (Preview in 3D):</h3>
+          <p class="pose-help">Click any gesture below to animate the 3D hand and test its kinematics:</p>
+          <div class="pose-buttons-grid">
+            <button class="btn btn-sm btn-secondary" onclick="demoPose('neutral')">1. Neutral (Flat)</button>
+            <button class="btn btn-sm btn-secondary" onclick="demoPose('hello')">2. HELLO (Upright)</button>
+            <button class="btn btn-sm btn-secondary" onclick="demoPose('thank_you')">3. THANK YOU (Palm Up)</button>
+            <button class="btn btn-sm btn-secondary" onclick="demoPose('yes')">4. YES (Fist)</button>
+            <button class="btn btn-sm btn-secondary" onclick="demoPose('no')">5. NO (Two Fingers)</button>
+            <button class="btn btn-sm btn-secondary" onclick="demoPose('please')">6. PLEASE (Fist + Thumb)</button>
+            <button class="btn btn-sm btn-secondary" onclick="demoPose('water')">7. WATER (Three Fingers)</button>
+            <button class="btn btn-sm btn-secondary" onclick="demoPose('food')">8. FOOD (Curled Hand)</button>
+            <button class="btn btn-sm btn-secondary" onclick="demoPose('need_help')">9. I NEED HELP (Thumb+Pinky)</button>
+            <button class="btn btn-sm btn-secondary" onclick="demoPose('toilet')">10. TOILET (Index+Pinky)</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Admin Review Section -->
+      <section id="admin-section" class="content-section">
+        <div class="section-header">
+          <div>
+            <h2>Phrase Review Queue</h2>
+            <p class="description">Review pending private recordings submitted by the glove before publishing.</p>
+          </div>
+          <div class="admin-auth-box">
+            <span id="admin-user-display" class="admin-user-tag">Admin: demo@admin.signglove.org</span>
+            <button id="auth-logout-btn" class="btn btn-sm btn-outline">Sign Out</button>
+          </div>
+        </div>
+
+        <div id="admin-feed" class="phrases-feed admin-queue">
+          <!-- Dynamically populated review cards -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Admin Login Modal -->
+    <div id="login-modal" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Admin Sign In</h3>
+          <button id="close-login-btn" class="btn-close">&times;</button>
+        </div>
+        <form id="login-form">
+          <p class="modal-info">Sign in to approve or reject raw sign captures queued by the mobile app.</p>
+          <div class="form-group">
+            <label for="admin-email">Admin Email</label>
+            <input type="email" id="admin-email" value="reviewer@admin.signglove.org" required>
+          </div>
+          <div class="form-group">
+            <label for="admin-password">Password</label>
+            <input type="password" id="admin-password" value="demo-password" required>
+          </div>
+          <div class="modal-actions">
+            <button type="button" id="demo-login-btn" class="btn btn-secondary">Use Demo Access</button>
+            <button type="submit" class="btn btn-primary">Sign In</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Sign Language Glove Platform &middot; Hardware: ESP32 + MPU6050 + 5 Flex Sensors &middot; Zero Cloud ML &middot; Privacy First</p>
+    </footer>
+  </div>
+
+  <!-- Firebase SDKs (Compat/v10 for standalone browser execution) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  
+  <!-- Three.js 3D WebGL Library & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="hand3d.js"></script>
+  
+  <script src="app.js"></script>
+</body>
+</html>
+
